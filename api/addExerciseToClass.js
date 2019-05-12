@@ -4,7 +4,7 @@ module.exports = app => {
     //Inserindo Vinculação do exercicio com a turma
 
     const insert = async (req, res) => {
-        const exerciseToClass = {...req.body}
+        const exerciseToClass = {...req.fields}
 
         try {
             existsOrError(exerciseToClass.cd_exercicio, 'Codigo do exercicio não informado');

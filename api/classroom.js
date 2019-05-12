@@ -3,7 +3,7 @@ module.exports = app => {
 
     //inserindo Turma
     const insert = async (req, res) => {
-        const classroom = {...req.body};
+        const classroom = {...req.fields};
         
         //validações
         try {
@@ -23,7 +23,7 @@ module.exports = app => {
 
     //Alterando turma
     const update = async (req, res) => {
-        const classroom = {...req.body};
+        const classroom = {...req.fields};
         id = req.params.id
         
         //validações

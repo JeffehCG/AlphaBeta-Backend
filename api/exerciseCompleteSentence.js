@@ -1,34 +1,35 @@
 module.exports = app => {
+
     const {existsOrError, notExistsOrError, equalsOrError} = app.api.validation;
 
     //Inserindo exercicio 
     const insertExercise = async (req , res) => {
-        const exercise = {...req.body}
+        const exercise = {...req.fields}
 
         try {
             existsOrError(exercise.ds_texto, 'Frase não informada')
             existsOrError(exercise.nm_url, 'Url do exercicio não informada')
             existsOrError(exercise.cd_professor, 'Codigo do professor não informado')
             existsOrError(exercise.ds_classificacao, 'Classificação não informada')
-            existsOrError(exercise.parameters, 'Parametros não informados')
+            // existsOrError(exercise.parameters, 'Parametros não informados')
             
         } catch (msg) {
             return res.status(400).send(msg);
         }
 
         //Pegando os parametros do exericicio
-        const parameters = exercise.parameters
+        // const parameters = exercise.parameters
         delete exercise.parameters
 
         //Percorendo e validando os parametros
-        for(let i in parameters){
-            try {
-                existsOrError(parameters[i].nm_texto, 'Palavra não informada')
-                existsOrError(parameters[i].ds_img, 'Imagem não informada')
-            } catch (msg) {
-                return res.status(400).send(msg);
-            }
-        }
+        // for(let i in parameters){
+        //     try {
+        //         existsOrError(parameters[i].nm_texto, 'Palavra não informada')
+        //         existsOrError(parameters[i].ds_img, 'Imagem não informada') 
+        //     } catch (msg) {
+        //         return res.status(400).send(msg);
+        //     }
+        // }
 
         //Inserindo o exercicio
         await app.db('excompfrase')
@@ -36,30 +37,30 @@ module.exports = app => {
             .then(_ => res.status(204).send())
             .catch(err => res.status(500).send(err))
 
-        //Pegando o codigo do ultimo exercicio cadastrado pelo professor
-        let idLastExercise = await app.db('excompfrase')
-            .where({cd_professor: exercise.cd_professor})
-            .max('cd_exercicio')
-            .first()
-        for (let y in idLastExercise){
-            idLastExercise = idLastExercise[y]
-        }
+        // //Pegando o codigo do ultimo exercicio cadastrado pelo professor
+        // let idLastExercise = await app.db('excompfrase')
+        //     .where({cd_professor: exercise.cd_professor})
+        //     .max('cd_exercicio')
+        //     .first()
+        // for (let y in idLastExercise){
+        //     idLastExercise = idLastExercise[y]
+        // }
 
-        //Inserindo os parametros
-        let idParams = 1
-        for(let x in parameters){
-            parameters[x].cd_parametro = idParams
-            parameters[x].cd_exercicio = idLastExercise
-            idParams ++
+        // //Inserindo os parametros
+        // let idParams = 1
+        // for(let x in parameters){
+        //     parameters[x].cd_parametro = idParams
+        //     parameters[x].cd_exercicio = idLastExercise
+        //     idParams ++
 
-            await app.db('prcompfrase')
-                .insert(parameters[x])
-        }
+        //     await app.db('prcompfrase')
+        //         .insert(parameters[x])
+        // }
     }
 
     //Alterando
     const updateExercise = async (req, res) => {
-        const exercise = {...req.body}
+        const exercise = {...req.fields}
         exercise.cd_exercicio = req.params.id
 
         try {

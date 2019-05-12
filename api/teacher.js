@@ -11,7 +11,7 @@ module.exports = app => {
 
     //inserindo professor
     const insert = async (req, res) => {
-        const teacher = {...req.body};
+        const teacher = {...req.fields};
         
         //validações
         try {
@@ -55,7 +55,7 @@ module.exports = app => {
 
     //Alterando professor
     const update = async (req, res) => {
-        const teacher = {...req.body};
+        const teacher = {...req.fields};
         teacher.cd_cpf = req.params.cpf
         
         //validações

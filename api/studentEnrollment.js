@@ -3,7 +3,7 @@ module.exports = app => {
 
     //inserindo Matricula
     const insert = async (req, res) => {
-        const enrollment = {...req.body};
+        const enrollment = {...req.fields};
         
         //validações
         try {

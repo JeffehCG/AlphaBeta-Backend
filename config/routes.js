@@ -70,6 +70,10 @@ module.exports = app => {
         .all(app.config.passport.authenticate())
         .post(teacher(app.api.exerciseCompleteSentence.insertExercise))
 
+    app.route('/paransExercise')
+        .all(app.config.passport.authenticate())
+        .post(teacher(app.api.paransExerciseComSent.insertParan))
+
     app.route('/exerciseComplete/:id')
         .all(app.config.passport.authenticate())
         .put(teacher(app.api.exerciseCompleteSentence.updateExercise))

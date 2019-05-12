@@ -5,16 +5,16 @@ const bcrypt = require('bcrypt-nodejs');
 module.exports = app => {
     //Metodo para efetuar login
     const signin = async (req, res) => {
-        if(!req.body.login || !req.body.password){
+        if(!req.fields.login || !req.fields.password){
             return res.status(400).send('Informe usuario e senha')
         }
 
         const student = await app.db('aluno')
-            .where({nm_email: req.body.login} || {cd_cpf: req.body.login})
+            .where({nm_email: req.fields.login} || {cd_cpf: req.fields.login})
             .first()
         
         const teacher = await app.db('professor')
-            .where({nm_email: req.body.login} || {cd_cpf: req.body.login})
+            .where({nm_email: req.fields.login} || {cd_cpf: req.fields.login})
             .first()
         
         if(!student && !teacher) return res.status(400).send('Usuario não encontrado')
@@ -35,7 +35,7 @@ module.exports = app => {
             user.teacher = false
         }
 
-        const isMatch = bcrypt.compareSync(req.body.password, user.password)
+        const isMatch = bcrypt.compareSync(req.fields.password, user.password)
         if (!isMatch) return res.status(401).send('Email/Senha invalidos')
         
         const now = Math.floor(Date.now()/1000)
@@ -57,7 +57,7 @@ module.exports = app => {
 
     //Validando o token recebido
     const validateToken = async (req, res) => {
-        const userData = req.body || null
+        const userData = req.fields || null
         try {
             if(userData){
                 const token = jwt.decode(userData.token, authSecret)
