@@ -146,12 +146,21 @@ module.exports = app => {
             .catch(err => res.status(500).send(err))
     }
 
+    const convertImgToBinary = (parans) => {
+        let paransImgBinary = parans.map(paran => {
+            paran.ds_img = paran.ds_img.toString('base64')
+            return paran
+        })
+
+        return paransImgBinary
+    }
+
     //Pegando parametros de um exercicio
     const getParamsExercise = async (req, res) => {
         const id = req.params.id
         app.db('prcompfrase')
             .where({cd_exercicio: id})
-            .then(exercises => res.json(exercises))
+            .then(exercises => res.json(convertImgToBinary(exercises)))
             .catch(err => res.status(500).send(err))
     }
 

@@ -22,7 +22,9 @@
     "passport": "0.4.0",
     "passport-jwt": "4.0.0",
     "mysql": "2.16.0",
-    "pm2": "3.0.4"
+    "pm2": "3.0.4",
+    "fs": "",
+    "express-formidable": ""
   },
   "devDependencies": {
     "nodemon": "1.18.4"
