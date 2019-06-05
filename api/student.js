@@ -106,6 +106,7 @@ module.exports = app => {
             .catch(err => res.status(500).send(err))
         }
 
+        //Listando exercicios de um aluno
         const getAllExerciseStudent = (req,res) => {
             cpf = req.params.cpf
             app.db({ e: 'excompfrase',  i: 'inclcompfrase',  t: 'turma',  m: 'matricula',  a: 'aluno'})

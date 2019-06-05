@@ -91,4 +91,12 @@ module.exports = app => {
     app.route('/exerciseToClass/:idExer/:idClass')
         .all(app.config.passport.authenticate())
         .delete(teacher(app.api.addExerciseToClass.remove))
+
+    app.route('/exerciseFinished')
+        .all(app.config.passport.authenticate())
+        .post(app.api.exercisesFinished.insert)
+    
+    app.route('/exerciseFinished/:cpf/:cdExercicio')
+        .all(app.config.passport.authenticate())
+        .get(app.api.exercisesFinished.exerciceFinished)
 }
