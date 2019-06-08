@@ -73,6 +73,14 @@ module.exports = app => {
     app.route('/paransExercise')
         .all(app.config.passport.authenticate())
         .post(teacher(app.api.paransExerciseComSent.insertParan))
+    
+    app.route('/paransExercise/:paran/:exercise')
+        .all(app.config.passport.authenticate())
+        .put(teacher(app.api.paransExerciseComSent.updateParan))
+    
+    app.route('/positionExercise/:paran/:exercise')
+        .all(app.config.passport.authenticate())
+        .put(teacher(app.api.paransExerciseComSent.updatePosition))
 
     app.route('/exerciseComplete/:id')
         .all(app.config.passport.authenticate())
