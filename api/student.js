@@ -75,9 +75,34 @@ module.exports = app => {
     }
 
     //Listando alunos
-    const get = (req, res) => {
+    const get = async (req, res) => {
+        const limit = 10
+        const page = req.query.page || 1
+        const result = await app.db('aluno').count('cd_cpf').first() 
+        let count
+        for (let y in result){
+            count = parseInt(result[y])
+        }
+
         app.db('aluno')
-            .select('cd_cpf', 'nm_nome', 'nm_email')
+            .select('cd_cpf', 'nm_nome', 'nm_sobrenome', 'nm_email')
+            .limit(limit).offset(page * limit - limit)
+            .then(students => res.json({data : students, count, limit}))
+            .catch(err => res.status(500).send(err))
+    }
+
+    const searchStudents = (req, res) => {
+        const search = {...req.fields}; 
+
+        try {
+            existsOrError(search.field, 'Campo não informado');
+            existsOrError(search.content, 'Pesquisa vazia');
+        } catch (msg) {
+            return res.status(400).send(msg);
+        }
+        app.db('aluno')
+            .select('cd_cpf', 'nm_nome', 'nm_sobrenome', 'nm_email')
+            .where(search.field, search.content)
             .then(students => res.json(students))
             .catch(err => res.status(500).send(err))
     }
@@ -96,8 +121,13 @@ module.exports = app => {
     //Listando turmas de um aluno
     const getAllClassStudent = (req,res) => {
         cpf = req.params.cpf
+        const page = req.query.page || 1
+
+        const limit = 5
+
         app.db({a: 'aluno', p: 'professor', m: 'matricula', t:'turma'})
             .select('p.nm_nome', 'p.nm_sobrenome', 'p.nm_email', 'm.dt_matricula', 't.aa_inicio', 't.nivel_turma', 't.cd_turma', 't.cd_cpf_professor')
+            .limit(limit).offset(page * limit - limit)
             .whereRaw('?? = ??', ['a.cd_cpf', 'm.cd_cpf_aluno'])
             .whereRaw('?? = ??', ['p.cd_cpf', 't.cd_cpf_professor'])
             .whereRaw('?? = ??', ['m.cd_turma', 't.cd_turma'])
@@ -106,11 +136,38 @@ module.exports = app => {
             .catch(err => res.status(500).send(err))
         }
 
+        const searchAllClassStudent = (req,res) => {
+            cpf = req.params.cpf
+
+            const search = {...req.fields}; 
+
+            try {
+                existsOrError(search.field, 'Campo não informado');
+                existsOrError(search.content, 'Pesquisa vazia');
+            } catch (msg) {
+                return res.status(400).send(msg);
+            }
+    
+            app.db({a: 'aluno', p: 'professor', m: 'matricula', t:'turma'})
+                .select('p.nm_nome', 'p.nm_sobrenome', 'p.nm_email', 'm.dt_matricula', 't.aa_inicio', 't.nivel_turma', 't.cd_turma', 't.cd_cpf_professor')
+                .whereRaw('?? = ??', ['a.cd_cpf', 'm.cd_cpf_aluno'])
+                .whereRaw('?? = ??', ['p.cd_cpf', 't.cd_cpf_professor'])
+                .whereRaw('?? = ??', ['m.cd_turma', 't.cd_turma'])
+                .where('a.cd_cpf', cpf)
+                .where(`t.${search.field}`, search.content)
+                .then(classroom => res.json(classroom))
+                .catch(err => res.status(500).send(err))
+            }
+
         //Listando exercicios de um aluno
         const getAllExerciseStudent = (req,res) => {
             cpf = req.params.cpf
+            const page = req.query.page || 1
+
+            const limit = 5
             app.db({ e: 'excompfrase',  i: 'inclcompfrase',  t: 'turma',  m: 'matricula',  a: 'aluno'})
                 .select('e.cd_exercicio','e.ds_texto', 'e.nm_url', 'e.cd_professor', 'e.ds_classificacao')
+                .limit(limit).offset(page * limit - limit)
                 .whereRaw('?? = ??', ['e.cd_exercicio', 'i.cd_exercicio'])
                 .whereRaw('?? = ??', ['t.cd_turma' , 'i.cd_turma'])
                 .whereRaw('?? = ??', ['t.cd_turma' , 'm.cd_turma' ])
@@ -120,5 +177,28 @@ module.exports = app => {
                 .catch(err => res.status(500).send(err))
             }
 
-    return {get,getById, insert, update, getAllClassStudent,getAllExerciseStudent}    
+            const searchExerciseStudent = (req,res) => {
+                cpf = req.params.cpf
+                const search = {...req.fields}; 
+
+                try {
+                    existsOrError(search.field, 'Campo não informado');
+                    existsOrError(search.content, 'Pesquisa vazia');
+                } catch (msg) {
+                    return res.status(400).send(msg);
+                }
+
+                app.db({ e: 'excompfrase',  i: 'inclcompfrase',  t: 'turma',  m: 'matricula',  a: 'aluno'})
+                    .select('e.cd_exercicio','e.ds_texto', 'e.nm_url', 'e.cd_professor', 'e.ds_classificacao')
+                    .whereRaw('?? = ??', ['e.cd_exercicio', 'i.cd_exercicio'])
+                    .whereRaw('?? = ??', ['t.cd_turma' , 'i.cd_turma'])
+                    .whereRaw('?? = ??', ['t.cd_turma' , 'm.cd_turma' ])
+                    .whereRaw('?? = ??', ['m.cd_cpf_aluno' , 'a.cd_cpf'])
+                    .where('a.cd_cpf', cpf)
+                    .where(`e.${search.field}`, search.content)
+                    .then(classroom => res.json(classroom))
+                    .catch(err => res.status(500).send(err))
+                }
+
+    return {get,getById, insert, update, getAllClassStudent,getAllExerciseStudent,searchExerciseStudent,searchAllClassStudent, searchStudents}    
 }

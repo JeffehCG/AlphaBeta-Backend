@@ -98,8 +98,30 @@ module.exports = app => {
     //Listando turmas pelo cpf do professor
     const getAllClassTeacher = (req, res) => {
         cpf = req.params.cpf
+        const page = req.query.page || 1
+
+        const limit = 5
+
+        app.db('turma')
+            .limit(limit).offset(page * limit - limit)
+            .where({cd_cpf_professor: cpf})
+            .then(classroom => res.json(classroom))
+            .catch(err => res.status(500).send(err))
+    }
+
+    const searchClassTeacher = (req, res) => {
+        cpf = req.params.cpf
+        const search = {...req.fields};
+        try {
+            existsOrError(search.field, 'Campo não informado');
+            existsOrError(search.content, 'Pesquisa vazia');
+        } catch (msg) {
+            return res.status(400).send(msg);
+        }
+
         app.db('turma')
             .where({cd_cpf_professor: cpf})
+            .where(search.field, search.content)
             .then(classroom => res.json(classroom))
             .catch(err => res.status(500).send(err))
     }
@@ -107,11 +129,49 @@ module.exports = app => {
     //Pegando todos exercicios vinculados com determinado professor
     const getExercisesByCpfTeacher = async (req, res) => {
         const cpf = req.params.cpf
+        const page = req.query.page || 1
+        const classes = req.query.classes
+        
+        let limit
+        if(classes){
+            limit = 10
+            const result = await app.db('excompfrase').where({cd_professor: cpf}).count('cd_exercicio').first() 
+            let count
+            for (let y in result){
+                count = parseInt(result[y])
+            }
+            app.db('excompfrase')
+                .limit(limit).offset(page * limit - limit)
+                .where({cd_professor: cpf})
+                .then(exercises => res.json({data : exercises, count, limit}))
+                .catch(err => res.status(500).send(err))
+        }else{
+            limit = 5
+            app.db('excompfrase')
+                .limit(limit).offset(page * limit - limit)
+                .where({cd_professor: cpf})
+                .then(exercises => res.json(exercises))
+                .catch(err => res.status(500).send(err))
+        }
+    }
+
+    const searchExercisesByCpfTeacher = async (req, res) => {
+        const cpf = req.params.cpf
+        const search = {...req.fields}; 
+
+        try {
+            existsOrError(search.field, 'Campo não informado');
+            existsOrError(search.content, 'Pesquisa vazia');
+        } catch (msg) {
+            return res.status(400).send(msg);
+        }
+
         app.db('excompfrase')
             .where({cd_professor: cpf})
+            .where(search.field, search.content)
             .then(exercises => res.json(exercises))
             .catch(err => res.status(500).send(err))
     }
 
-    return {get,getById, insert, update, getAllClassTeacher,getExercisesByCpfTeacher}    
+    return {get,getById, insert, update, getAllClassTeacher,getExercisesByCpfTeacher,searchExercisesByCpfTeacher,searchClassTeacher}    
 }

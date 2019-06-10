@@ -107,4 +107,24 @@ module.exports = app => {
     app.route('/exerciseFinished/:cpf/:cdExercicio')
         .all(app.config.passport.authenticate())
         .get(app.api.exercisesFinished.exerciceFinished)
+
+    app.route('/searcheExerciceTeacher/:cpf')
+        .all(app.config.passport.authenticate())
+        .post(teacher(app.api.teacher.searchExercisesByCpfTeacher))
+
+    app.route('/searcheExerciceStudent/:cpf')
+        .all(app.config.passport.authenticate())
+        .post(app.api.student.searchExerciseStudent)
+
+    app.route('/searcheClassesTeacher/:cpf')
+        .all(app.config.passport.authenticate())
+        .post(teacher(app.api.teacher.searchClassTeacher))
+
+    app.route('/searcheClassesStudent/:cpf')
+        .all(app.config.passport.authenticate())
+        .post(app.api.student.searchAllClassStudent)
+
+    app.route('/searchStudents')
+        .all(app.config.passport.authenticate())
+        .post(teacher(app.api.student.searchStudents))
 }
