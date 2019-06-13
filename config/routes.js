@@ -127,4 +127,12 @@ module.exports = app => {
     app.route('/searchStudents')
         .all(app.config.passport.authenticate())
         .post(teacher(app.api.student.searchStudents))
+    
+    app.route('/statsTeacher/:cpf')
+        .all(app.config.passport.authenticate())
+        .get(teacher(app.api.stats.getStatsTeacher))
+
+    app.route('/statsStudent/:cpf')
+        .all(app.config.passport.authenticate())
+        .get(app.api.stats.getStatsStudent)
 }
