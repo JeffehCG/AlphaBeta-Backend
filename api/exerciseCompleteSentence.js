@@ -117,5 +117,18 @@ module.exports = app => {
             .catch(err => res.status(500).send(err))
     }
 
-    return {insertExercise,updateExercise, removeExercise, getExercisesById, getParamsExercise}
+    //Pegando a imagem do primeiro parametro
+    const getParamsExerciseFirst = async (req, res) => {
+        const id = req.params.id
+        app.db('prcompfrase')
+            .where({cd_exercicio: id})
+            .first()
+            .then(exercises => {
+                let img = exercises.ds_img.toString('base64')
+                res.json(img)
+            })
+            .catch(err => res.status(500).send(err))
+    }
+
+    return {insertExercise,updateExercise, removeExercise, getExercisesById, getParamsExercise,getParamsExerciseFirst}
 }

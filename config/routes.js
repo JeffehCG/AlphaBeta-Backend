@@ -92,6 +92,10 @@ module.exports = app => {
         .all(app.config.passport.authenticate())
         .get(app.api.exerciseCompleteSentence.getParamsExercise)
 
+    app.route('/exerciseComplete/paramsFirstImg/:id')
+        .all(app.config.passport.authenticate())
+        .get(app.api.exerciseCompleteSentence.getParamsExerciseFirst)
+
     app.route('/exerciseToClass')
         .all(app.config.passport.authenticate())
         .post(teacher(app.api.addExerciseToClass.insert))
