@@ -10,11 +10,17 @@ module.exports = app => {
         }
 
         const student = await app.db('aluno')
-            .where({nm_email: req.fields.login} || {cd_cpf: req.fields.login})
+            // .where({nm_email: req.fields.login} || {cd_cpf: req.fields.login})
+            .where(function(){
+                this.where({nm_email: req.fields.login}).orWhere({cd_cpf: req.fields.login})
+            })
             .first()
         
         const teacher = await app.db('professor')
-            .where({nm_email: req.fields.login} || {cd_cpf: req.fields.login})
+            // .where({nm_email: req.fields.login} || {cd_cpf: req.fields.login})
+            .where(function(){
+                this.where({nm_email: req.fields.login}).orWhere({cd_cpf: req.fields.login})
+            })
             .first()
         
         if(!student && !teacher) return res.status(400).send('Usuario não encontrado')
